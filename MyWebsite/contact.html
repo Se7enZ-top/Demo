@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="联系Se7enZ">
+    <title>Contact | Se7enZ</title>
+    <link rel="icon" href="/images/favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="css/style.css">
+    <script>
+        // 防止主题切换闪烁：在页面渲染前立即应用主题
+        (function() {
+            try {
+                const theme = localStorage.getItem('theme');
+                if (theme === 'dark') {
+                    document.documentElement.classList.add('dark-mode');
+                    // 如果 body 已加载，也立即添加类
+                    if (document.body) {
+                        document.body.classList.add('dark-mode');
+                    }
+                }
+            } catch (e) {}
+        })();
+    </script>
+</head>
+<body>
+    <div id="header"></div>
+    <div class="container">
+        <main>
+            <div class="card">
+                <h2>联系我</h2>
+                <form action="https://getform.io/f/aqoqmeva" method="POST" class="contact-form-container">
+                    <input type="text" name="name" placeholder="Name" class="contact-form-input" required>
+                    <input type="email" name="email" placeholder="Email" class="contact-form-input" required>
+                    <textarea name="message" placeholder="Message" rows="5" class="contact-form-textarea" required></textarea>
+                    <!-- add hidden Honeypot input to prevent spams -->
+                    <input type="hidden" name="_gotcha" style="display:none !important">
+                    <button type="submit" class="project-link contact-form-submit">Send</button>
+                </form>
+            </div>
+        </main>
+    </div>
+    <div id="footer"></div>
+    <script src="js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,859 @@
+/* ==========================================================================
+   1. 全局变量定义 (Root Variables)
+   ========================================================================== */
+:root {
+    --bg-color: #f8f9fa;           /* 页面背景色 */
+    --card-bg: #ffffff;           /* 卡片背景色 */
+    --text-primary: #2d3436;       /* 主要文字颜色 */
+    --text-secondary: #636e72;     /* 次要文字颜色 */
+    --nav-bg: rgba(255, 255, 255, 0.95); /* 导航栏背景 - 带透明度 */
+    --accent-color: #0984e3;       /* 品牌蓝色 */
+    --border-color: #eee;          /* 边框颜色 */
+    
+    /* 浅色模式 Hero 渐变 */
+    --hero-gradient: linear-gradient(135deg, #6c5ce7 0%, #0984e3 100%); 
+    
+    /* 链接颜色 */
+    --link-color: #0984e3;
+    --link-hover: #07497d;
+
+    /* 代码块颜色 */
+    --code-bg: #f6f8fa;
+    --code-color: #24292e;
+    --code-border: #d0d7de;
+}
+
+/* ==========================================================================
+   2. 深色模式变量覆盖 (Dark Mode)
+   ========================================================================== */
+html.dark-mode,
+body.dark-mode {
+    --bg-color: #121212;
+    --card-bg: #1e1e1e;
+    --text-primary: #e0e0e0;
+    --text-secondary: #b0b0b0;
+    --nav-bg: rgba(30, 30, 30, 0.95); /* 深色导航背景 */
+    --border-color: #333;
+
+    /* 深色模式下的 Hero 渐变：更深邃且不刺眼 */
+    --hero-gradient: linear-gradient(135deg, #2d3436 0%, #0f0c29 50%, #302b63 100%); 
+    
+    /* 深色模式链接颜色：提高亮度以保证对比度 */
+    --link-color: #74b9ff;
+    --link-hover: #a29bfe;
+
+    /* 代码块颜色 */
+    --code-bg: #282c34;
+    --code-color: #abb2bf;
+    --code-border: #444;
+}
+/* ==========================================================================
+   3. 基础布局
+   ========================================================================== */
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    margin: 0;
+    background-color: var(--bg-color);
+    color: var(--text-primary);
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    overflow-x: hidden; /* 防止横向溢出干扰粘性定位 */
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* ==========================================================================
+   4. 导航栏 (Header) - 修复吸顶效果
+   ========================================================================== */
+#header {
+    position: sticky;      /* 关键：粘性定位 */
+    top: 0;                /* 关键：必须为0 */
+    z-index: 2000;         /* 确保在最顶层 */
+    width: 100%;
+}
+
+.navbar {
+    background: var(--nav-bg);
+    backdrop-filter: blur(10px); /* 毛玻璃效果 */
+    -webkit-backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--border-color);
+    padding: 1rem 10%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    transition: background 0.3s ease;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.navbar .logo {
+    font-weight: bold;
+    font-size: 1.8rem !important;
+    color: var(--text-primary);
+}
+
+.navbar .nav-links {
+    display: flex;
+    list-style: none;
+    gap: 25px;
+    margin: 0;
+    padding: 0;
+    align-items: center;
+}
+
+.navbar .nav-links a {
+    text-decoration: none;
+    color: var(--text-primary);
+    font-size: 1.1rem;
+    transition: color 0.3s;
+}
+
+.navbar .nav-links a:hover {
+    color: var(--accent-color);
+}
+
+/* ==========================================================================
+   5. 核心容器与卡片
+   ========================================================================== */
+.container {
+    display: flex;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 2rem 20px;
+    gap: 40px;
+    flex: 1;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.card { 
+    background: var(--card-bg); 
+    padding: 2rem; 
+    border-radius: 12px; 
+    border: 1px solid var(--border-color); 
+    margin-bottom: 20px; 
+    transition: background 0.3s, border-color 0.3s;
+}
+
+/* ==========================================================================
+   6. Hero 区域
+   ========================================================================== */
+.hero-section {
+    text-align: center !important;
+    padding: 5rem 2rem;
+    background: var(--hero-gradient) !important;
+    color: white !important;
+    border: none !important;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    border-radius: 12px;
+    margin-bottom: 2rem;
+    transition: background 0.5s ease;
+}
+
+.hero-section h1, 
+.hero-section .subtitle,
+.hero-section .hero-subtitle, 
+.hero-section .bio-content p {
+    color: white !important;
+}
+
+.hero-section .subtitle,
+.hero-subtitle {
+    font-size: 1.2rem;
+}
+
+.hero-section .action-buttons,
+.hero-action-buttons {
+    margin-top: 2.5rem;
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    align-items: center;
+}
+
+/* ==========================================================================
+   7. 博客侧边栏与 Markdown 内容
+   ========================================================================== */
+.sidebar { 
+    flex: 0 0 240px;
+    background: var(--card-bg); 
+    padding: 20px; 
+    border-radius: 12px; 
+    border: 1px solid var(--border-color); 
+    height: fit-content;
+    position: sticky;
+    top: 100px; /* 留出 Header 的空间 */
+}
+
+/* Markdown 链接颜色 */
+.markdown-body a {
+    color: var(--link-color);
+    text-decoration: none;
+    transition: color 0.3s ease;
+    border-bottom: 1px solid transparent;
+}
+
+.markdown-body a:hover {
+    color: var(--link-hover);
+    text-decoration: underline;
+}
+
+/* 代码块样式确保跟随变量 */
+.markdown-body pre {
+    background-color: var(--code-bg) !important;
+    color: var(--code-color) !important;
+    border: 1px solid var(--code-border) !important;
+    padding: 1.2rem;
+    border-radius: 8px;
+}
+
+/* ==========================================================================
+   8. 页脚 (Footer)
+   ========================================================================= */
+#footer {
+    background: var(--nav-bg);
+    border-top: 1px solid var(--border-color);
+    margin-top: auto;
+    padding: 1rem 20px;
+    text-align: center;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* ==========================================================================
+   9. 功能组件 (按钮/网格)
+   ========================================================================== */
+.theme-toggle {
+    background: none;
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+    padding: 6px 15px;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.3s;
+    font-size: 0.9rem;
+}
+
+.theme-toggle:hover {
+    background: var(--accent-color);
+    color: white;
+}
+
+.portfolio-grid, .tools-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); 
+    gap: 25px;
+    width: 100%;
+}
+
+.project-card, .tool-item {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    display: flex;
+    flex-direction: column;
+}
+
+.project-card:hover, .tool-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+}
+
+.tool-item {
+    cursor: pointer;
+    text-decoration: none;
+    color: inherit;
+}
+
+.tool-item:hover {
+    text-decoration: none;
+    color: inherit;
+}
+
+.project-link {
+    display: block;
+    padding: 12px;
+    background: var(--accent-color);
+    color: white;
+    text-align: center;
+    text-decoration: none;
+    font-weight: bold;
+    border-radius: 6px;
+    transition: background 0.3s ease;
+}
+
+main { 
+    flex: 1; 
+    min-width: 0; 
+}
+
+/* 确保博客页面的main有flex: 1 */
+#app main {
+    flex: 1;
+}
+
+/* ==========================================================================
+   10. 博客相关样式
+   ========================================================================== */
+.sidebar-item {
+    cursor: pointer;
+    padding: 8px 12px;
+    border-radius: 6px;
+    transition: all 0.3s;
+    color: var(--text-secondary);
+}
+
+.sidebar-item:hover {
+    background: rgba(9, 132, 227, 0.1);
+    color: var(--accent-color);
+}
+
+.sidebar-item.active {
+    background: var(--accent-color);
+    color: white !important;
+}
+
+.post-excerpt {
+    color: var(--text-secondary);
+    line-height: 1.6;
+    font-size: 0.95rem;
+    margin: 10px 0 20px 0;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    line-clamp: 2;
+    overflow: hidden;
+}
+
+.post-meta {
+    color: var(--text-secondary);
+    font-size: 0.8rem;
+    margin: 8px 0;
+}
+
+.post-header {
+    margin-bottom: 30px;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 20px;
+}
+
+.post-footer {
+    margin-top: 50px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border-color);
+    text-align: left;
+}
+
+.post-category-badge {
+    background: var(--accent-color);
+    color: white;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    font-weight: bold;
+}
+
+.search-input {
+    width: 100%;
+    max-width: 1000px;
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    background: var(--bg-color);
+    color: var(--text-primary);
+    outline: none;
+}
+
+.search-container {
+    margin-bottom: 25px;
+    padding: 1.5rem;
+    display: flex;
+    justify-content: center;
+}
+
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    margin-top: 30px;
+}
+
+.pagination button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* ==========================================================================
+   11. Markdown 内容样式
+   ========================================================================== */
+.markdown-body { 
+    line-height: 1.8; 
+    font-size: 1.1rem; 
+    color: var(--text-primary); 
+}
+
+.markdown-body pre {
+    background-color: var(--code-bg) !important;
+    color: var(--code-color) !important;
+    border: 1px solid var(--code-border) !important;
+    padding: 1.2rem;
+    border-radius: 8px;
+    overflow-x: auto;
+    margin: 1.5rem 0;
+}
+
+.markdown-body pre code {
+    background: transparent !important; 
+    color: inherit !important;
+}
+
+.loading-skeleton {
+    color: var(--text-secondary);
+    text-align: center;
+    padding: 4rem;
+}
+
+.error-container {
+    text-align: center;
+    padding: 4rem;
+}
+
+
+/* ==========================================================================
+   14. 表单样式
+   ========================================================================== */
+.contact-form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.form-input,
+.form-textarea {
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid var(--border-color);
+    background: var(--bg-color);
+    color: var(--text-primary);
+    font-family: inherit;
+    font-size: 1rem;
+}
+
+.form-textarea {
+    resize: vertical;
+    min-height: 120px;
+}
+
+.form-input:focus,
+.form-textarea:focus {
+    outline: none;
+    border-color: var(--accent-color);
+}
+
+.project-link-button {
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+.project-link-inline {
+    display: inline-block;
+    width: auto;
+    padding: 8px 24px;
+    text-decoration: none;
+}
+
+.project-link-large {
+    display: inline-block;
+    margin-top: 20px;
+    width: auto;
+    padding: 10px 25px;
+}
+
+/* ==========================================================================
+   15. 文章卡片布局
+   ========================================================================== */
+.post-title-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.post-card {
+    margin-bottom: 20px;
+}
+
+/* ==========================================================================
+   16. 通用工具类
+   ========================================================================== */
+.text-center {
+    text-align: center;
+}
+
+.flex {
+    display: flex;
+}
+
+.flex-column {
+    flex-direction: column;
+}
+
+.justify-center {
+    justify-content: center;
+}
+
+.justify-between {
+    justify-content: space-between;
+}
+
+.align-center {
+    align-items: center;
+}
+
+.gap-10 {
+    gap: 10px;
+}
+
+.gap-20 {
+    gap: 20px;
+}
+
+.margin-0 {
+    margin: 0;
+}
+
+.margin-top-0 {
+    margin-top: 0;
+}
+
+.margin-bottom-0 {
+    margin-bottom: 0;
+}
+
+.padding-0 {
+    padding: 0;
+}
+
+.list-style-none {
+    list-style: none;
+}
+
+.line-height-2 {
+    line-height: 2;
+}
+
+.line-height-2-5 {
+    line-height: 2.5;
+}
+
+.font-size-small {
+    font-size: 0.9rem;
+}
+
+.font-size-smallest {
+    font-size: 0.8rem;
+}
+
+.font-weight-bold {
+    font-weight: bold;
+}
+
+.font-weight-500 {
+    font-weight: 500;
+}
+
+/* ==========================================================================
+   17. Hero区域样式增强
+   ========================================================================== */
+.hero-subtitle {
+    font-size: 1.2rem;
+}
+
+.hero-action-buttons {
+    margin-top: 2.5rem;
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    align-items: center;
+}
+
+.hero-button-white {
+    background: white;
+    color: var(--accent-color);
+    padding: 12px 30px;
+    border-radius: 30px;
+    text-decoration: none;
+}
+
+.hero-button-white:hover {
+    background: rgba(255, 255, 255, 0.9);
+}
+
+.hero-link-white {
+    color: white;
+    text-decoration: none;
+    font-weight: 500;
+    align-self: center;
+}
+
+/* ==========================================================================
+   18. 内容列表样式
+   ========================================================================== */
+.content-list {
+    line-height: 2;
+    color: var(--text-secondary);
+}
+
+/* ==========================================================================
+   19. 侧边栏样式增强
+   ========================================================================== */
+.sidebar h3 {
+    margin-top: 0;
+}
+
+.sidebar ul {
+    list-style: none;
+    padding: 0;
+    line-height: 2.5;
+}
+
+.sidebar-nav-link {
+    color: var(--accent-color);
+    text-decoration: none;
+}
+
+/* ==========================================================================
+   20. 博客列表页样式
+   ========================================================================== */
+.blog-search-container {
+    margin-bottom: 25px;
+    padding: 1.5rem;
+    display: flex;
+    justify-content: center;
+}
+
+.blog-search-input {
+    width: 100%;
+    max-width: 1000px;
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    background: var(--bg-color);
+    color: var(--text-primary);
+    outline: none;
+}
+
+.post-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.post-card-title {
+    margin: 0;
+}
+
+.post-category-badge-inline {
+    background: var(--accent-color);
+    color: white;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    font-weight: bold;
+}
+
+.post-meta-inline {
+    color: var(--text-secondary);
+    font-size: 0.8rem;
+    margin: 8px 0;
+}
+
+.post-read-more {
+    display: inline-block;
+    width: auto;
+    padding: 8px 24px;
+    text-decoration: none;
+}
+
+/* ==========================================================================
+   21. 分页样式
+   ========================================================================== */
+.pagination-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    margin-top: 30px;
+}
+
+.pagination-info {
+    font-weight: bold;
+}
+
+/* ==========================================================================
+   22. 文章详情页样式
+   ========================================================================== */
+.post-detail-header {
+    margin-bottom: 30px;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 20px;
+}
+
+.post-detail-title {
+    font-size: 2.2rem;
+    margin-bottom: 15px;
+}
+
+.post-detail-meta {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+.post-detail-meta span + span {
+    margin-left: 20px;
+}
+
+.post-detail-footer {
+    margin-top: 50px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border-color);
+    text-align: left;
+}
+
+.post-detail-back-link {
+    display: inline-block;
+    width: auto;
+    padding: 8px 24px;
+    text-decoration: none;
+}
+
+.post-detail-error-icon {
+    font-size: 3rem;
+}
+
+.post-detail-error-message {
+    color: var(--text-secondary);
+}
+
+.post-detail-error-link {
+    display: inline-block;
+    margin-top: 20px;
+    width: auto;
+    padding: 10px 25px;
+}
+
+/* ==========================================================================
+   23. 项目卡片样式增强
+   ========================================================================== */
+.project-card-image {
+    height: 200px;
+    background: #eee;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.project-card-content {
+    padding: 15px;
+}
+
+.project-card-description {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+/* ==========================================================================
+   24. 工具卡片样式增强
+   ========================================================================== */
+.tool-item-content {
+    padding: 20px;
+}
+
+.tool-icon {
+    font-size: 2rem;
+}
+
+.tool-description {
+    color: var(--text-secondary);
+}
+
+/* ==========================================================================
+   25. 联系表单样式增强
+   ========================================================================== */
+.contact-form-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.contact-form-input,
+.contact-form-textarea {
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid var(--border-color);
+    background: var(--bg-color);
+    color: var(--text-primary);
+    font-family: inherit;
+    font-size: 1rem;
+}
+
+.contact-form-textarea {
+    resize: vertical;
+    min-height: 120px;
+}
+
+.contact-form-input:focus,
+.contact-form-textarea:focus {
+    outline: none;
+    border-color: var(--accent-color);
+}
+
+.contact-form-submit {
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+/* ==========================================================================
+   26. 响应式设计
+   ========================================================================== */
+@media (max-width: 768px) {
+    .container {
+        flex-direction: column;
+        padding: 1rem 15px;
+    }
+    
+    .sidebar {
+        position: static;
+        flex: 1;
+        margin-bottom: 20px;
+    }
+    
+    .hero-section {
+        padding: 3rem 1.5rem;
+    }
+    
+    .hero-action-buttons {
+        flex-direction: column;
+    }
+    
+    .portfolio-grid,
+    .tools-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .navbar {
+        padding: 1rem 5%;
+    }
+    
+    .navbar .nav-links {
+        gap: 15px;
+        font-size: 0.95rem;
+    }
+}

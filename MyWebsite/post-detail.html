@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Se7enZ的博客文章详情">
+    <title>Article | Se7enZ</title>
+    <link rel="icon" href="/images/favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="css/style.css">
+    <script>
+        // 防止主题切换闪烁：在页面渲染前立即应用主题
+        (function() {
+            try {
+                const theme = localStorage.getItem('theme');
+                const isDark = theme === 'dark';
+                if (isDark) {
+                    document.documentElement.classList.add('dark-mode');
+                    // 如果 body 已加载，也立即添加类
+                    if (document.body) {
+                        document.body.classList.add('dark-mode');
+                    }
+                }
+            } catch (e) {}
+        })();
+    </script>
+    <script>
+        // 提前设置 Highlight.js 主题，防止代码块闪烁
+        (function() {
+            try {
+                const theme = localStorage.getItem('theme');
+                const isDark = theme === 'dark';
+                const hljsThemeHref = isDark 
+                    ? 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css'
+                    : 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css';
+                var link = document.createElement('link');
+                link.id = 'hljs-theme';
+                link.rel = 'stylesheet';
+                link.href = hljsThemeHref;
+                document.head.appendChild(link);
+            } catch (e) {}
+        })();
+    </script>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+</head>
+<body>
+    <div id="header"></div>
+
+    <div class="container">
+        <main id="app">
+            <div v-if="loading" class="card loading-skeleton">
+                <p>正在深度解析文章内容...</p>
+            </div>
+
+            <div v-else-if="!post" class="card error-container">
+                <span class="post-detail-error-icon">⚠️</span>
+                <h2>未找到该文章</h2>
+                <p class="post-detail-error-message">请检查文章 ID 是否正确或文件是否存在</p>
+                <a href="blog.html" class="project-link post-detail-error-link">返回博客列表</a>
+            </div>
+
+            <article v-else class="card fade-in">
+                <header class="post-detail-header">
+                    <h1 class="post-detail-title">{{ post.title }}</h1>
+                    <div class="post-detail-meta">
+                        <span>📅 发布日期：{{ post.date }}</span>
+                        <span>🏷️ 分类：{{ post.category }}</span>
+                    </div>
+                </header>
+
+                <div class="markdown-body" v-html="renderedContent"></div>
+
+                <footer class="post-detail-footer">
+                    <a href="blog.html" class="project-link post-detail-back-link">
+                        ← 返回列表
+                    </a>
+                </footer>
+            </article>
+        </main>
+    </div>
+
+    <div id="footer"></div>
+
+    <script src="js/main.js"></script>
+
+    <script>
+        const { createApp, ref, onMounted, computed, nextTick } = Vue;
+
+        createApp({
+            setup() {
+                const post = ref(null);
+                const markdownRaw = ref("");
+                const loading = ref(true);
+
+                onMounted(async () => {
+                    try {
+                        // 1. 获取 URL 中的 ID 参数
+                        const params = new URLSearchParams(window.location.search);
+                        const idFromUrl = params.get('id');
+                        
+                        if (!idFromUrl) {
+                            loading.value = false;
+                            return;
+                        }
+
+                        // 2. 加载文章索引
+                        const resIndex = await fetch('data/posts.json');
+                        if (!resIndex.ok) throw new Error("无法加载文章索引");
+                        
+                        const posts = await resIndex.json();
+                        
+                        // 3. 查找文章 (强制将 idFromUrl 转为数字进行对比)
+                        const foundPost = posts.find(p => p.id === Number(idFromUrl));
+
+                        if (foundPost) {
+                            post.value = foundPost;
+                            
+                            // 4. 加载 Markdown 文件
+                            const resContent = await fetch(foundPost.path);
+                            if (resContent.ok) {
+                                markdownRaw.value = await resContent.text();
+                            } else {
+                                markdownRaw.value = "# 😅 内容加载失败\n抱歉，该文章的 Markdown 文件路径（" + foundPost.path + "）无法访问。";
+                            }
+                        }
+                    } catch (err) {
+                        console.error('详情页初始化错误:', err);
+                    } finally {
+                        loading.value = false;
+                        
+                        // 5. 等待内容渲染后执行代码高亮
+                        await nextTick();
+                        document.querySelectorAll('pre code').forEach((block) => {
+                            hljs.highlightElement(block);
+                        });
+                    }
+                });
+
+                // 使用计算属性将 Markdown 转为 HTML
+                const renderedContent = computed(() => {
+                    if (!markdownRaw.value) return "";
+                    // 配置 marked（可选）
+                    marked.setOptions({
+                        breaks: true, // 支持换行符
+                        gfm: true     // 启用 GitHub 风格的 Markdown
+                    });
+                    return marked.parse(markdownRaw.value);
+                });
+
+                return { post, loading, renderedContent };
+            }
+        }).mount('#app');
+    </script>
+</body>
+</html>

@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Se7enZ的作品集">
+    <title>Projects | Se7enZ</title>
+    <link rel="icon" href="/images/favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="css/style.css">
+    <script>
+        // 防止主题切换闪烁：在页面渲染前立即应用主题
+        (function() {
+            try {
+                const theme = localStorage.getItem('theme');
+                if (theme === 'dark') {
+                    document.documentElement.classList.add('dark-mode');
+                    // 如果 body 已加载，也立即添加类
+                    if (document.body) {
+                        document.body.classList.add('dark-mode');
+                    }
+                }
+            } catch (e) {}
+        })();
+    </script>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+</head>
+<body>
+    <div id="header"></div>
+    <div class="container" id="app">
+        <main>
+            <section class="card">
+                <h2>作品集</h2>
+                <div style="background: linear-gradient(135deg, rgba(9, 132, 227, 0.08) 0%, rgba(108, 92, 231, 0.08) 100%); border: 1px solid rgba(9, 132, 227, 0.15); border-radius: 8px; margin-top: 15px; margin-bottom: 30px; padding: 18px 20px;">
+                    <p style="text-align: center; color: var(--accent-color); font-style: italic; font-size: 1.3rem; font-weight: 600; margin: 0; line-height: 1.8; letter-spacing: 0.5px;">
+                        行是知之始，知是行之成
+                    </p>
+                </div>
+                <div v-if="loading" class="card text-center loading-skeleton">加载中...</div>
+                <div v-else-if="projects.length === 0" class="card text-center loading-skeleton">
+                    暂无项目
+                </div>
+                <div v-else class="portfolio-grid">
+                    <div class="project-card fade-in" v-for="project in projects" :key="project.id">
+                        <div class="project-card-image">
+                            <img 
+                                v-if="project.image" 
+                                :src="project.image" 
+                                :alt="project.title" 
+                                style="width: 100%; height: 100%; object-fit: cover;"
+                                @error="$event.target.style.display='none'"
+                            >
+                            <div v-if="!project.image || project.image === ''" style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: var(--bg-color); color: var(--text-secondary);">
+                                🎨 项目预览
+                            </div>
+                        </div>
+                        <div class="project-card-content">
+                            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; gap: 10px;">
+                                <h3 style="flex: 1; margin: 0;">{{ project.title }}</h3>
+                                <span v-if="project.status" class="post-category-badge-inline" :style="project.status === '已完成' ? 'background: #00b894;' : project.status === '进行中' ? 'background: #0984e3;' : 'background: var(--text-secondary);'">
+                                    {{ project.status }}
+                                </span>
+                            </div>
+                            <p class="project-card-description">{{ project.description }}</p>
+                            <div v-if="project.tags && project.tags.length > 0" style="margin-top: 10px; margin-bottom: 10px; display: flex; flex-wrap: wrap; gap: 5px;">
+                                <span 
+                                    v-for="tag in project.tags" 
+                                    :key="tag" 
+                                    style="display: inline-block; background: var(--accent-color); color: white; padding: 2px 8px; border-radius: 4px; font-size: 0.8rem;"
+                                >
+                                    {{ tag }}
+                                </span>
+                            </div>
+                            <p v-if="project.date" class="post-meta-inline" style="margin-top: 10px;">📅 {{ project.date }}</p>
+                        </div>
+                        <a :href="project.link || '#'" class="project-link">查看详情</a>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+    <div id="footer"></div>
+    <script src="js/main.js"></script>
+    <script>
+        const { createApp, ref, onMounted } = Vue;
+
+        createApp({
+            setup() {
+                const projects = ref([]);
+                const loading = ref(true);
+
+                onMounted(async () => {
+                    try {
+                        const res = await fetch('data/projects.json');
+                        if (!res.ok) throw new Error('加载失败');
+                        projects.value = await res.json();
+                    } catch (err) {
+                        console.error("加载项目列表失败", err);
+                    } finally {
+                        loading.value = false;
+                    }
+                });
+
+                return { 
+                    projects, 
+                    loading
+                };
+            }
+        }).mount('#app');
+    </script>
+</body>
+</html>

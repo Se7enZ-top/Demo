@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Se7enZ的开发者工具箱">
+    <title>Tools | Se7enZ</title>
+    <link rel="icon" href="/images/favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="css/style.css">
+    <script>
+        // 防止主题切换闪烁：在页面渲染前立即应用主题
+        (function() {
+            try {
+                const theme = localStorage.getItem('theme');
+                if (theme === 'dark') {
+                    document.documentElement.classList.add('dark-mode');
+                    // 如果 body 已加载，也立即添加类
+                    if (document.body) {
+                        document.body.classList.add('dark-mode');
+                    }
+                }
+            } catch (e) {}
+        })();
+    </script>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+</head>
+<body>
+    <div id="header"></div>
+    <div class="container" id="app">
+        <main>
+            <section class="card">
+                <h2>开发者工具箱</h2>
+                <div v-if="loading" class="card text-center loading-skeleton">加载中...</div>
+                <div v-else-if="tools.length === 0" class="card text-center loading-skeleton">
+                    暂无工具
+                </div>
+                <div v-else class="tools-grid">
+                    <a :href="tool.link" class="tool-item fade-in" v-for="tool in tools" :key="tool.id" style="text-decoration: none; color: inherit;">
+                        <div class="tool-item-content">
+                            <span class="tool-icon">{{ tool.icon }}</span>
+                            <h3>{{ tool.title }}</h3>
+                            <p class="tool-description">{{ tool.description }}</p>
+                            <span v-if="tool.category" style="display: inline-block; background: var(--accent-color); color: white; padding: 2px 8px; border-radius: 4px; font-size: 0.8rem; margin-top: 10px;">
+                                {{ tool.category }}
+                            </span>
+                        </div>
+                    </a>
+                </div>
+            </section>
+        </main>
+    </div>
+    <div id="footer"></div>
+    <script src="js/main.js"></script>
+    <script>
+        const { createApp, ref, onMounted } = Vue;
+
+        createApp({
+            setup() {
+                const tools = ref([]);
+                const loading = ref(true);
+
+                onMounted(async () => {
+                    try {
+                        const res = await fetch('data/tools.json');
+                        if (!res.ok) throw new Error('加载失败');
+                        tools.value = await res.json();
+                    } catch (err) {
+                        console.error("加载工具列表失败", err);
+                    } finally {
+                        loading.value = false;
+                    }
+                });
+
+                return { 
+                    tools, 
+                    loading
+                };
+            }
+        }).mount('#app');
+    </script>
+</body>
+</html>

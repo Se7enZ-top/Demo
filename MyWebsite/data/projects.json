@@ -1,0 +1,23 @@
+[
+    {
+        "id": 1,
+        "title": "OAuthLogin",
+        "description": "基于OAuth2和gin框架的GitHub登陆模型",
+        "image": "images/project1.png",
+        "tags": ["OAuth", "gin"],
+        "date": "2025-12-25",
+        "link": "https://github.com/Se7enZ-top/Demo/tree/main/OAuth2",
+        "status": "已完成"
+    },
+    {
+        "id": 2,
+        "title": "MyWebsite",
+        "description": "一个简洁的个人网站（由Cursor实现）",
+        "image": "images/project2.png",
+        "tags": ["Vue", "Cursor"],
+        "date": "2025-12-27",
+        "link": "https://github.com/Se7enZ-top/Demo/tree/main/MyWebsite",
+        "status": "已完成"
+    }
+]
+

@@ -1,0 +1,21 @@
+[
+    {
+        "id": 1,
+        "title": "OAuth与Go实战",
+        "date": "2025-12-25",
+        "category": "技术",
+        "coreWord": "OAuth",
+        "excerpt": "基于OAuth2和gin框架的GitHub登陆模型。",
+        "path": "data/posts/post1.md"
+    },
+    {
+        "id": 2,
+        "title": "Mywebsite",
+        "date": "2025-12-27",
+        "category": "技术",
+        "coreWord": "Vue",
+        "excerpt": "一个简洁优雅的个人网站，展示个人简介、博客文章、项目作品和开发工具。采用纯前端技术栈，支持深色/浅色主题切换，响应式设计，数据驱动的内容管理（本项目由Cursor+Claude实现）",
+        "path": "data/posts/post2.md"
+    }
+]
+

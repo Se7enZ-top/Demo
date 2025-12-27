@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Se7enZ的博客 - 技术文章和生活随笔">
+    <title>Blog | Se7enZ</title>
+    <link rel="icon" href="/images/favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="css/style.css">
+    <script>
+        // 防止主题切换闪烁：在页面渲染前立即应用主题
+        (function() {
+            try {
+                const theme = localStorage.getItem('theme');
+                if (theme === 'dark') {
+                    document.documentElement.classList.add('dark-mode');
+                    // 如果 body 已加载，也立即添加类
+                    if (document.body) {
+                        document.body.classList.add('dark-mode');
+                    }
+                }
+            } catch (e) {}
+        })();
+    </script>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+</head>
+<body>
+    <div id="header"></div>
+
+    <div class="container" id="app">
+        <div style="flex: 0 0 240px; display: flex; flex-direction: column; gap: 20px; align-self: flex-start; position: sticky; top: 100px;">
+            <aside class="sidebar" style="position: static;">
+                <h3>文章分类</h3>
+                <ul>
+                    <li 
+                        class="sidebar-item" 
+                        :class="{ active: selectedCategory === '' }"
+                        @click="selectedCategory = ''"
+                    >
+                        # 全部文章 ({{ posts.length }})
+                    </li>
+                    <li 
+                        v-for="cat in categories" 
+                        :key="cat"
+                        class="sidebar-item"
+                        :class="{ active: selectedCategory === cat }"
+                        @click="selectedCategory = cat"
+                    >
+                        # {{ cat }} ({{ getCount(cat) }})
+                    </li>
+                </ul>
+            </aside>
+            
+            <aside class="sidebar" style="position: static; background: linear-gradient(135deg, rgba(9, 132, 227, 0.08) 0%, rgba(108, 92, 231, 0.08) 100%); border: 1px solid rgba(9, 132, 227, 0.15);">
+                <div style="padding: 20px 10px;">
+                    <p style="text-align: center; color: var(--accent-color); font-style: italic; font-size: 1.4rem; font-weight: 600; margin: 0; line-height: 1.8; letter-spacing: 2px;">
+                        Stay Hungry, Stay Foolish
+                    </p>
+                </div>
+            </aside>
+        </div>
+
+        <main>
+            <div class="card blog-search-container">
+                <input 
+                    type="text" 
+                    v-model="searchQuery" 
+                    placeholder="输入关键词搜索..." 
+                    class="blog-search-input"
+                >
+            </div>
+            <div v-if="loading" class="card text-center">加载中...</div>
+            
+            <section v-else>
+                <article class="card fade-in" v-for="post in paginatedPosts" :key="post.id">
+                    <div class="post-card-header">
+                        <h2 class="post-card-title">{{ post.title }}</h2>
+                        <span class="post-category-badge-inline">
+                            {{ post.coreWord }}
+                        </span>
+                    </div>
+                    <p class="post-meta-inline">📅 {{ post.date }}</p>
+                    <p v-if="post.excerpt" class="post-excerpt">{{ post.excerpt }}</p>
+                    <a :href="'post-detail.html?id=' + post.id" class="project-link post-read-more">
+                        阅读全文 →
+                    </a>
+                </article>
+
+                <div v-if="filteredPosts.length === 0" class="card text-center loading-skeleton">
+                    没有找到匹配文章
+                </div>
+
+                <div v-if="totalPages > 1" class="pagination-container">
+                    <button 
+                        class="theme-toggle" 
+                        @click="currentPage--" 
+                        :disabled="currentPage === 1"
+                    >
+                        上一页
+                    </button>
+                    <span class="pagination-info">{{ currentPage }} / {{ totalPages }}</span>
+                    <button 
+                        class="theme-toggle" 
+                        @click="currentPage++" 
+                        :disabled="currentPage === totalPages"
+                    >
+                        下一页
+                    </button>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <div id="footer"></div>
+
+    <script src="js/main.js"></script>
+    <script>
+        const { createApp, ref, onMounted, computed, watch } = Vue;
+
+        createApp({
+            setup() {
+                const posts = ref([]);
+                const loading = ref(true);
+                const selectedCategory = ref("");
+                
+                // 搜索逻辑相关
+                const searchQuery = ref("");
+                const debouncedQuery = ref("");
+                let timeoutId = null;
+
+                // 分页相关
+                const currentPage = ref(1);
+                const pageSize = 5; // 每页显示 5 篇
+
+                // 监听搜索输入实施防抖
+                watch(searchQuery, (newVal) => {
+                    clearTimeout(timeoutId);
+                    timeoutId = setTimeout(() => {
+                        debouncedQuery.value = newVal;
+                        currentPage.value = 1; // 搜索时重置页码
+                    }, 300);
+                });
+
+                // 监听分类切换重置页码
+                watch(selectedCategory, () => {
+                    currentPage.value = 1;
+                });
+
+                onMounted(async () => {
+                    try {
+                        const res = await fetch('data/posts.json');
+                        posts.value = await res.json();
+                    } catch (err) {
+                        console.error("加载文章列表失败", err);
+                    } finally {
+                        loading.value = false;
+                    }
+                });
+
+                const categories = computed(() => {
+                    const allCats = posts.value.map(p => p.category);
+                    return [...new Set(allCats)];
+                });
+
+                const getCount = (cat) => {
+                    return posts.value.filter(p => p.category === cat).length;
+                };
+
+                // 核心过滤逻辑：基于分类和防抖后的搜索词
+                const filteredPosts = computed(() => {
+                    return posts.value.filter(post => {
+                        const matchesCat = selectedCategory.value === "" || post.category === selectedCategory.value;
+                        const query = debouncedQuery.value.toLowerCase();
+                        const matchesSearch = post.title.toLowerCase().includes(query) || 
+                                            (post.excerpt && post.excerpt.toLowerCase().includes(query));
+                        return matchesCat && matchesSearch;
+                    });
+                });
+
+                // 分页切片逻辑
+                const paginatedPosts = computed(() => {
+                    const start = (currentPage.value - 1) * pageSize;
+                    const end = start + pageSize;
+                    return filteredPosts.value.slice(start, end);
+                });
+
+                // 总页数计算
+                const totalPages = computed(() => {
+                    return Math.ceil(filteredPosts.value.length / pageSize) || 1;
+                });
+
+                return { 
+                    posts, loading, searchQuery, selectedCategory, 
+                    categories, getCount, filteredPosts, 
+                    paginatedPosts, currentPage, totalPages 
+                };
+            }
+        }).mount('#app');
+    </script>
+</body>
+</html>

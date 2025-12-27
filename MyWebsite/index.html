@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Se7enZ的个人网站 - 全栈开发工程师">
+    <title>Se7enZ | Home</title>
+    <link rel="icon" href="/images/favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="css/style.css">
+    <script>
+        // 防止主题切换闪烁：在页面渲染前立即应用主题
+        (function() {
+            try {
+                const theme = localStorage.getItem('theme');
+                if (theme === 'dark') {
+                    document.documentElement.classList.add('dark-mode');
+                    // 如果 body 已加载，也立即添加类
+                    if (document.body) {
+                        document.body.classList.add('dark-mode');
+                    }
+                }
+            } catch (e) {}
+        })();
+    </script>
+</head>
+<body>
+    <div id="header"></div>
+
+    <div class="container">
+        <main>
+            <section class="card hero-section">
+                <h1 class="fade-in">👋 你好，我是 Se7enZ</h1>
+                <p class="subtitle hero-subtitle">后端开发工程师 / 终身学习者 / 极简主义追求者</p>
+                <div class="bio-content">
+                    <p>我热衷于使用 <strong>Go</strong>和 <strong>Cloud Native</strong> 技术构建高质量应用。
+                    </p>
+                </div>
+                <div class="action-buttons hero-action-buttons">
+                    <a href="projects.html" class="project-link hero-button-white">查看作品</a>
+                    <a href="blog.html" class="hero-link-white">阅读博客 →</a>
+                </div>
+
+            </section>
+
+            <section class="card">
+                <h3>🛠 当前关注</h3>
+                <ul class="content-list">
+                    <li>🚀 容器化与 Kubernetes 编排优化</li>
+                    <li>📝 沉淀更系统的后端架构设计知识</li>
+                </ul>
+            </section>
+        </main>
+    </div>
+
+    <div id="footer"></div>
+    <script src="js/main.js"></script>
+</body>
+</html>
